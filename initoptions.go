@@ -12,7 +12,9 @@ type config struct {
 }
 
 func initConfig(opts []InitOption) *config {
-	cfg := &config{}
+	cfg := &config{
+		logSpam: true,
+	}
 
 	for _, o := range opts {
 		o(cfg)
