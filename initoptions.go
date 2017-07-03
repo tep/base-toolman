@@ -1,9 +1,14 @@
 package toolman
 
+import (
+	"flag"
+)
+
 type config struct {
 	stdsigs bool
 	logDir  string
 	logSpam bool
+	pidfile string
 }
 
 func initConfig(opts []InitOption) *config {
@@ -40,5 +45,15 @@ func Quiet() InitOption {
 func StandardSignals() InitOption {
 	return func(c *config) {
 		c.stdsigs = true
+	}
+}
+
+var pidfilename *string
+
+func PIDFile(dflt string) InitOption {
+	pidfilename = flag.String("pidfile", dflt, "Path to file where PID is written")
+
+	return func(c *config) {
+		c.pidfile = *pidfilename
 	}
 }

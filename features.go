@@ -3,14 +3,18 @@ package toolman
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/user"
+	"strconv"
 	"syscall"
 	"time"
 
 	"toolman.org/base/flagutil"
 	"toolman.org/base/osutil"
 	"toolman.org/base/signals"
+
+  log "github.com/golang/glog"
 )
 
 func (c *config) setupLogging() {
@@ -29,7 +33,6 @@ func (c *config) setupLogging() {
 			fmt.Fprintf(os.Stderr, "Failed to override --log_dir=%q: %v", c.logDir, err)
 		}
 	}
-
 }
 
 func addLogSpam() {
@@ -66,4 +69,21 @@ func setupStdSignals() {
 		Shutdown()
 		return true
 	}, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+}
+
+func (c *config) writePIDFile() {
+	if c.pidfile == "" {
+		return
+	}
+
+	if err := ioutil.WriteFile(c.pidfile, []byte(strconv.Itoa(os.Getpid())+"\n"), 0644); err != nil {
+		log.Errorf("writing pid file %q: %v", c.pidfile, err)
+		return
+	}
+
+	RegisterShutdown(func() {
+		if err := os.Remove(c.pidfile); err != nil {
+			log.Warning("pidfile %q not removed on shutdown: %v", c.pidfile, err)
+		}
+	})
 }

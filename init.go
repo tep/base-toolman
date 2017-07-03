@@ -103,6 +103,10 @@ func Init(opts ...InitOption) {
 		addLogSpam()
 	}
 
+	if cfg.pidfile != "" {
+		cfg.writePIDFile()
+	}
+
 	RegisterShutdown(func() { log.Flush(); time.Sleep(5 * time.Millisecond) })
 
 	for _, f := range initfuncs {
