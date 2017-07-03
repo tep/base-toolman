@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"toolman.org/base/runtimeutil"
+	"toolman.org/base/signals"
 
 	log "github.com/golang/glog"
 )
@@ -69,6 +70,10 @@ func Shutdown() {
 
 func Abort(mesg string) {
 	shutdown(1, mesg)
+}
+
+func ShutdownOn(sigs ...os.Signal) {
+	signals.RegisterHandler(func(os.Signal) bool { Shutdown(); return true }, sigs...)
 }
 
 func shutdown(code int, mesg string) {
