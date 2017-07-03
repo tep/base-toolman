@@ -43,16 +43,8 @@ package toolman // import "toolman.org/base/toolman"
 
 import (
 	"flag"
-	"fmt"
-	"os"
-	"os/user"
 	"sync"
-	"syscall"
 	"time"
-
-	"toolman.org/base/flagutil"
-	"toolman.org/base/osutil"
-	"toolman.org/base/signals"
 
 	log "github.com/golang/glog"
 )
