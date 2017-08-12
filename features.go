@@ -37,27 +37,27 @@ func (c *config) setupLogging() {
 
 func addLogSpam() {
 	var info string
-	log.Infof("  Start Time: %s", time.Now().Format(time.RFC3339Nano))
-	log.Infof("  Process ID: %d", os.Getpid())
+	log.InfoDepth(2, fmt.Sprintf("  Start Time: %s", time.Now().Format(time.RFC3339Nano)))
+	log.InfoDepth(2, fmt.Sprintf("  Process ID: %d", os.Getpid()))
 
 	if dir, err := os.Getwd(); err != nil {
 		info = fmt.Sprintf("not available: %v", err)
 	} else {
 		info = dir
 	}
-	log.Infof(" Working Dir: %s", info)
+	log.InfoDepth(2, fmt.Sprintf(" Working Dir: %s", info))
 
 	if u, err := user.Current(); err != nil {
 		info = fmt.Sprintf("not available: %v", err)
 	} else {
 		info = fmt.Sprintf("%s [%s:%s]", u.Username, u.Uid, u.Gid)
 	}
-	log.Infof("        User: %s", info)
+	log.InfoDepth(2, fmt.Sprintf("        User: %s", info))
 
-	log.Infof("Command Line: %s", os.Args[0])
+	log.InfoDepth(2, fmt.Sprintf("Command Line: %s", os.Args[0]))
 	if len(os.Args) > 1 {
 		for _, a := range os.Args[1:] {
-			log.Infof("                  %s", a)
+			log.InfoDepth(2, fmt.Sprintf("                  %s", a))
 		}
 	}
 }
