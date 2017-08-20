@@ -1,7 +1,6 @@
 package toolman
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,10 +14,14 @@ import (
 	"toolman.org/base/signals"
 
   log "github.com/golang/glog"
+	flag "github.com/spf13/pflag"
 )
 
-func (c *config) setupLogging() {
-	ld, isSet := flagutil.ValueIsSet("log_dir")
+func (c *config) setupLogging() error {
+	ld, isSet, err := flagutil.ValueIsSet("log_dir")
+	if err != nil {
+		return err
+	}
 
 	if isSet {
 		c.logDir = ld
@@ -33,6 +36,8 @@ func (c *config) setupLogging() {
 			fmt.Fprintf(os.Stderr, "Failed to override --log_dir=%q: %v", c.logDir, err)
 		}
 	}
+
+	return nil
 }
 
 func addLogSpam() {
