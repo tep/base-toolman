@@ -1,3 +1,5 @@
+package toolman // import "toolman.org/base/toolman"
+
 // Copyright 2017 The Toolworks Development Trust. All rights reserved.
 //
 // Package toolman provides common initialization for toolman.org Go programs.
@@ -39,12 +41,12 @@
 //
 // 		}
 //
-package toolman // import "toolman.org/base/toolman"
 
 import (
-	"flag"
 	"sync"
 	"time"
+
+	"toolman.org/base/flagutil"
 
 	log "github.com/golang/glog"
 )
@@ -52,24 +54,21 @@ import (
 var (
 	initialized bool
 	finalized   bool
-	initfuncs   []func()
+	initfuncs   []InitFunc
 	downactions []*shutdownAction
 	initmutex   sync.Mutex
 	downmutex   sync.Mutex
 )
 
-func RegisterInit(f func()) {
-	initmutex.Lock()
-	defer initmutex.Unlock()
+// InitFunc is a function registered via RegisterInit.
+type InitFunc func()
 
-	if initialized {
-		log.ErrorDepth(1, "Cannot register new Init function after calling Init()")
-		return
-	}
-
-	initfuncs = append(initfuncs, f)
-}
-
+// Init is the common initialization method for all toolman.org Go programs
+// and should usually be the first call at the top of main().  Zero or more
+// InitOptions may be provided to alter Init's behavior.
+//
+// Please note, Init may only be called once; any subsequent calls to Init
+// will cause a panic.
 func Init(opts ...InitOption) {
 	initmutex.Lock()
 	defer initmutex.Unlock()
@@ -79,8 +78,8 @@ func Init(opts ...InitOption) {
 		panic("toolman.Init() called multiple times!")
 	}
 
-	if !flag.Parsed() {
-		flag.Parse()
+	if err := flagutil.MergeAndParse(); err != nil {
+		panic(err)
 	}
 
 	cfg := initConfig(opts)
@@ -89,7 +88,9 @@ func Init(opts ...InitOption) {
 		setupStdSignals()
 	}
 
-	cfg.setupLogging()
+	if err := cfg.setupLogging(); err != nil {
+		panic(err)
+	}
 
 	if cfg.logSpam {
 		addLogSpam()
@@ -104,4 +105,41 @@ func Init(opts ...InitOption) {
 	for _, f := range initfuncs {
 		f()
 	}
+}
+
+// DumbInit calls the standard Init() routine with only the Quiet InitOption.
+// This function is provided as a convenience for times when no logging is
+// desired and no other options are needed, but the program still needs to
+// process command line flags and execute InitFuncs registed by library code.
+func DumbInit() {
+	Init(Quiet())
+}
+
+// RegisterInit registers an initialization function to be executed by
+// toolman.Init. Calls to RegisterInit are most commonly made from a library's
+// own init() function but execution of the registered function does not happen
+// until after toolman.Init has: a) merged and parsed all command line flags,
+// b) processed all provided InitOptions and c) setup standard logging.
+//
+// RegisterInit will only register InitFuncs before calls to Init(); once
+// Init has been called, RegisterInit will log an error message indicating
+// that it refused to register the InitFunc.
+//
+// Functions registered via RegisterInit should avoid much heavy lifting as
+// there are likely many and each one is executed upon startup of every
+// participating Go program.  These functions also have no mechanism for
+// dealing with error conditions (other than reporting them via standard
+// logging) so risky operations should also be avoided. However, if your
+// library simply cannot function properly due to an initialization failure,
+// your registered functions should panic.
+func RegisterInit(f InitFunc) {
+	initmutex.Lock()
+	defer initmutex.Unlock()
+
+	if initialized {
+		log.ErrorDepth(1, "InitFunc not registered after call to Init()")
+		return
+	}
+
+	initfuncs = append(initfuncs, f)
 }
