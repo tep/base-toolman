@@ -9,20 +9,13 @@ import (
 	"syscall"
 	"time"
 
-	"toolman.org/base/flagutil"
+	"toolman.org/base/log"
 	"toolman.org/base/osutil"
 	"toolman.org/base/signals"
-
-  log "github.com/golang/glog"
-	flag "github.com/spf13/pflag"
 )
 
 func (c *config) setupLogging() error {
-	ld, isSet, err := flagutil.ValueIsSet("log_dir")
-	if err != nil {
-		return err
-	}
-
+	ld, isSet := c.flags.ValueIsSet("log_dir")
 	if isSet {
 		c.logDir = ld
 	}
@@ -32,9 +25,22 @@ func (c *config) setupLogging() error {
 	}
 
 	if !isSet {
-		if err := flag.Set("log_dir", c.logDir); err != nil {
+		if err := c.flags.Set("log_dir", c.logDir); err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to override --log_dir=%q: %v", c.logDir, err)
 		}
+	}
+
+	// A specified command-line flag overrides the config value
+	if ulf, ok := c.flags.ValueIsSet("logfiles"); ok {
+		if v, err := strconv.ParseBool(ulf); err == nil {
+			c.logFiles = v
+		}
+	}
+
+	if c.logFiles {
+		log.Flush()
+	} else {
+		log.DisableLogFiles()
 	}
 
 	return nil
@@ -69,9 +75,11 @@ func addLogSpam() {
 
 func setupStdSignals() {
 	signals.RegisterSoftHandler(func(os.Signal) bool {
-		log.Infof("shutting down")
-		signals.Stop()
-		Shutdown()
+		log.Infof("shutting down now")
+		go func() {
+			signals.Stop()
+			Shutdown()
+		}()
 		return true
 	}, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 }

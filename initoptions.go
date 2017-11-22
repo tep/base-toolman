@@ -9,62 +9,97 @@ package toolman
 //        (see PIDFile as an example)
 //
 import (
-	flag "github.com/spf13/pflag"
+	"github.com/spf13/pflag"
+	"toolman.org/base/flagutil"
 )
 
 type config struct {
-	stdsigs bool
-	logDir  string
-	logSpam bool
-	pidfile string
+	stdsigs  bool
+	logDir   string
+	logFiles bool
+	logSpam  bool
+	pidfile  string
+	flags    *flagutil.FlagsGroup
 }
 
-func initConfig(opts []InitOption) *config {
+func newConfig(opts []*InitOption) *config {
 	cfg := &config{
-		logSpam: true,
+		flags:    flagutil.NewFlagsGroup(),
+		logSpam:  true,
+		logFiles: true,
 	}
 
 	for _, o := range opts {
-		o(cfg)
+		if o.init != nil {
+			o.init(cfg)
+		}
 	}
 
 	return cfg
 }
 
+func (c *config) setup(opts []*InitOption) {
+	for _, o := range opts {
+		if o.setup != nil {
+			o.setup(c)
+		}
+	}
+}
+
+type cfgFunc func(*config)
+
 // An InitOption alters the behavior of toolman.Init.
-type InitOption func(c *config)
+type InitOption struct {
+	// init functions are called *before* flag parsing
+	init cfgFunc
+	// setup functions are called *after* flags are parsed
+	setup cfgFunc
+}
+
+// FlagSet returns an InitOption that makes fs the primary FlagSet
+// for this app's FlagsGroup.
+func FlagSet(fs *pflag.FlagSet) *InitOption {
+	return &InitOption{func(c *config) { c.flags.SetPrimary(fs) }, nil}
+}
+
+// AddFlagSet returns an InitOption that adds the given FlagSet to the
+// group of FlagSets being processed by this application.  This is useful
+// for integration with frameworks that provide their own flag parsing.
+func AddFlagSet(sets ...*pflag.FlagSet) *InitOption {
+	return &InitOption{func(c *config) {
+		for _, fs := range sets {
+			c.flags.AddFlagSet(fs)
+		}
+	}, nil}
+}
 
 // LogSpam returns an InitOption that enables (spam=true) or disables
 // (spam=false) detailed information at the top of a program's log file.
-func LogSpam(spam bool) InitOption {
-	return func(c *config) {
-		c.logSpam = spam
-	}
+func LogSpam(spam bool) *InitOption {
+	return &InitOption{nil, func(c *config) { c.logSpam = spam }}
 }
 
 // LogDir returns an InitOption that sets the logging output directory to dir.
-func LogDir(dir string) InitOption {
-	return func(c *config) {
-		c.logDir = dir
-	}
+func LogDir(dir string) *InitOption {
+	return &InitOption{nil, func(c *config) { c.logDir = dir }}
 }
 
 // Quiet returns an InitOption that disables logging altogether.
-func Quiet() InitOption {
-	return func(c *config) {
+func Quiet() *InitOption {
+	return &InitOption{nil, func(c *config) {
 		c.logSpam = false
-		c.logDir = "/dev/null"
-	}
+		c.logFiles = false
+	}}
 }
 
 // StandardSignals returns an InitOption that sets up signal handlers to
 // shutdown the program on receipt of SIGHUP, SIGINT or SIGTERM. For more
 // fine-grained control of shutdown behavior, see toolman.RegisterShutdown
 // and toolman.ShutdownOn.
-func StandardSignals() InitOption {
-	return func(c *config) {
+func StandardSignals() *InitOption {
+	return &InitOption{nil, func(c *config) {
 		c.stdsigs = true
-	}
+	}}
 }
 
 var pidfilename *string
@@ -73,10 +108,10 @@ var pidfilename *string
 // process ID to the file named by dflt. This InitOption also registers a new
 // --pidfile flag that allows the user to change the PID file's path on
 // invocation.
-func PIDFile(dflt string) InitOption {
-	pidfilename = flag.String("pidfile", dflt, "Path to file where PID is written")
+func PIDFile(dflt string) *InitOption {
+	pidfilename = pflag.String("pidfile", dflt, "Path to file where PID is written")
 
-	return func(c *config) {
+	return &InitOption{nil, func(c *config) {
 		c.pidfile = *pidfilename
-	}
+	}}
 }

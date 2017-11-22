@@ -46,9 +46,7 @@ import (
 	"sync"
 	"time"
 
-	"toolman.org/base/flagutil"
-
-	log "github.com/golang/glog"
+	"toolman.org/base/log"
 )
 
 var (
@@ -69,7 +67,7 @@ type InitFunc func()
 //
 // Please note, Init may only be called once; any subsequent calls to Init
 // will cause a panic.
-func Init(opts ...InitOption) {
+func Init(opts ...*InitOption) {
 	initmutex.Lock()
 	defer initmutex.Unlock()
 	defer func() { initialized = true }()
@@ -78,11 +76,13 @@ func Init(opts ...InitOption) {
 		panic("toolman.Init() called multiple times!")
 	}
 
-	if err := flagutil.MergeAndParse(); err != nil {
+	cfg := newConfig(opts)
+
+	if err := cfg.flags.Parse(); err != nil {
 		panic(err)
 	}
 
-	cfg := initConfig(opts)
+	cfg.setup(opts)
 
 	if cfg.stdsigs {
 		setupStdSignals()
