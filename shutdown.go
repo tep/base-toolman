@@ -5,10 +5,9 @@ import (
 	"os"
 	"time"
 
+	"toolman.org/base/log"
 	"toolman.org/base/runtimeutil"
 	"toolman.org/base/signals"
-
-	log "github.com/golang/glog"
 )
 
 // ShutdownFunc is a function that is registered for execution upon Shutdown or
@@ -103,13 +102,17 @@ func Shutdown() {
 	shutdown(0, "")
 }
 
-// Abort terminates the running program and exits with a return code of 1. If
-// the mesg argument is not the empty string, it will be issued on STDERR just
-// prior to termination. Similar to Shutdown, Abort will execute all registered
+// Abort terminates the running program and exits with a return code of 1.
+// If err is not nil, its Error() string will be issued on STDERR just prior
+// to termination. Similar to Shutdown, Abort will execute all registered
 // ShutdownFuncs enabled for abort and employs the same time allowance logic
 // as Shutdown.
-func Abort(mesg string) {
-	shutdown(1, mesg)
+func Abort(err error) {
+	var msg string
+	if err != nil {
+		msg = err.Error()
+	}
+	shutdown(1, msg)
 }
 
 // ShutdownOn causes Shutdown to be called when the current process receives
