@@ -38,6 +38,12 @@ func (c *config) setupLogging() error {
 	}
 
 	if c.logFiles {
+		if c.mkLogDir {
+			if err := os.MkdirAll(c.logDir, 0777); err != nil {
+				c.flags.Set("logtostderr", "true")
+				log.Warning(err)
+			}
+		}
 		log.Flush()
 	} else {
 		log.DisableLogFiles()
