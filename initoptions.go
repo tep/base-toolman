@@ -54,42 +54,74 @@ type InitOption struct {
 	init cfgFunc
 	// setup functions are called *after* flags are parsed
 	setup cfgFunc
+	// applied is true when an If condition is true
+	applied bool
+}
+
+func If(cond func() bool, options ...*InitOption) *InitOption {
+	ret := &InitOption{}
+
+	ret.setup = func(c *config) {
+		if ret.applied = cond(); ret.applied {
+			for _, opt := range options {
+				opt.setup(c)
+			}
+		}
+	}
+
+	return ret
+}
+
+func (o *InitOption) Else(options ...*InitOption) *InitOption {
+	return &InitOption{
+		setup: func(c *config) {
+			if !o.applied {
+				for _, opt := range options {
+					opt.setup(c)
+				}
+			}
+		},
+	}
 }
 
 // FlagSet returns an InitOption that makes fs the primary FlagSet
 // for this app's FlagsGroup.
 func FlagSet(fs *pflag.FlagSet) *InitOption {
-	return &InitOption{func(c *config) { c.flags.SetPrimary(fs) }, nil}
+	return &InitOption{init: func(c *config) { c.flags.SetPrimary(fs) }}
 }
 
 // AddFlagSet returns an InitOption that adds the given FlagSet to the
 // group of FlagSets being processed by this application.  This is useful
 // for integration with frameworks that provide their own flag parsing.
 func AddFlagSet(sets ...*pflag.FlagSet) *InitOption {
-	return &InitOption{func(c *config) {
-		for _, fs := range sets {
-			c.flags.AddFlagSet(fs)
-		}
-	}, nil}
+	return &InitOption{
+		init: func(c *config) {
+			for _, fs := range sets {
+				c.flags.AddFlagSet(fs)
+			}
+		},
+	}
 }
 
 // LogSpam returns an InitOption that enables (spam=true) or disables
 // (spam=false) detailed information at the top of a program's log file.
 func LogSpam(spam bool) *InitOption {
-	return &InitOption{nil, func(c *config) { c.logSpam = spam }}
+	return &InitOption{setup: func(c *config) { c.logSpam = spam }}
 }
 
 // LogDir returns an InitOption that sets the logging output directory to dir.
 func LogDir(dir string) *InitOption {
-	return &InitOption{nil, func(c *config) { c.logDir = dir }}
+	return &InitOption{setup: func(c *config) { c.logDir = dir }}
 }
 
 // Quiet returns an InitOption that disables logging altogether.
 func Quiet() *InitOption {
-	return &InitOption{nil, func(c *config) {
-		c.logSpam = false
-		c.logFiles = false
-	}}
+	return &InitOption{
+		setup: func(c *config) {
+			c.logSpam = false
+			c.logFiles = false
+		},
+	}
 }
 
 // StandardSignals returns an InitOption that sets up signal handlers to
@@ -97,9 +129,7 @@ func Quiet() *InitOption {
 // fine-grained control of shutdown behavior, see toolman.RegisterShutdown
 // and toolman.ShutdownOn.
 func StandardSignals() *InitOption {
-	return &InitOption{nil, func(c *config) {
-		c.stdsigs = true
-	}}
+	return &InitOption{setup: func(c *config) { c.stdsigs = true }}
 }
 
 var pidfilename *string
@@ -110,8 +140,5 @@ var pidfilename *string
 // invocation.
 func PIDFile(dflt string) *InitOption {
 	pidfilename = pflag.String("pidfile", dflt, "Path to file where PID is written")
-
-	return &InitOption{nil, func(c *config) {
-		c.pidfile = *pidfilename
-	}}
+	return &InitOption{setup: func(c *config) { c.pidfile = *pidfilename }}
 }
