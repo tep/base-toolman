@@ -107,11 +107,17 @@ func Init(opts ...*InitOption) {
 	}
 }
 
-// DumbInit calls the standard Init() routine with only the Quiet InitOption.
+// DumbInit is deprecated, please use InitCLI instead.
+func DumbInit() {
+	Init(Quiet())
+	log.Warning("DumbInit is deprecated; please switch to InitCLI")
+}
+
+// InitCLI calls the standard Init() routine with only the Quiet InitOption.
 // This function is provided as a convenience for times when no logging is
 // desired and no other options are needed, but the program still needs to
 // process command line flags and execute InitFuncs registed by library code.
-func DumbInit() {
+func InitCLI() {
 	Init(Quiet())
 }
 
