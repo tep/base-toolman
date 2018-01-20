@@ -16,6 +16,7 @@ import (
 type config struct {
 	stdsigs  bool
 	logDir   string
+	mkLogDir bool
 	logFiles bool
 	logSpam  bool
 	pidfile  string
@@ -112,6 +113,13 @@ func LogSpam(spam bool) *InitOption {
 // LogDir returns an InitOption that sets the logging output directory to dir.
 func LogDir(dir string) *InitOption {
 	return &InitOption{setup: func(c *config) { c.logDir = dir }}
+}
+
+// MakeLogDir returns an InitOption indicating that missing log directories
+// should be created. If dir creation fails, logging will be redirected to
+// stderr automatically.
+func MakeLogDir() *InitOption {
+	return &InitOption{setup: func(c *config) { c.mkLogDir = true }}
 }
 
 // Quiet returns an InitOption that disables logging altogether.
