@@ -1,0 +1,14 @@
+github.com/spf13/pflag v1.0.2 h1:Fy0orTDgHdbnzHcsOgfCN4LtHf0ec3wwtiwJqwvf3Gc=
+github.com/spf13/pflag v1.0.2/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
+toolman.org/base/flagutil v1.0.4 h1:bkB5gk1mxwzxhhqFVAZKcmYfNGiiSgPuJuE9SPyPfe0=
+toolman.org/base/flagutil v1.0.4/go.mod h1:vTHAJKzwVGz0KMlD8r+emGdn2mnAj6DYJB1MwRgllC4=
+toolman.org/base/log v0.0.0-20171122035328-733244c76f23 h1:cGd7PXTES1Pmc70sDluqtgUOmYeFqsmOT3rt8oELbfc=
+toolman.org/base/log v0.0.0-20171122035328-733244c76f23/go.mod h1:hrV1wsklEfvJMfqxURrC8IDyWpYWcMgPk1evbVgXjvI=
+toolman.org/base/log v1.1.1 h1:nYfXrGQjglLRVC4SqKlo1QNOk2TmpaJ66hbgIPw4aZo=
+toolman.org/base/log v1.1.1/go.mod h1:hrV1wsklEfvJMfqxURrC8IDyWpYWcMgPk1evbVgXjvI=
+toolman.org/base/osutil v1.0.0 h1:nB3Ci7pd4wDnxjeWd4cjvA7kY+aRbXOHM9iXwoJAD1o=
+toolman.org/base/osutil v1.0.0/go.mod h1:ZJPjMfpk8WSm4u+bKpPbnsd8La6Ze9aJj3tU/WlM39M=
+toolman.org/base/runtimeutil v1.0.0 h1:SEHNA5v0Jt11GTRQbyNFr0aVdWoBHprEm4231nx88HI=
+toolman.org/base/runtimeutil v1.0.0/go.mod h1:Qr/NewvIMNdG/IGvPC6BSRh6boJuyVQR4ZcofO1bGEk=
+toolman.org/base/signals v1.0.0 h1:UNTlUSeDA1xVimJfmLDnqQa0PpzfFJPz0gk63Q9fWek=
+toolman.org/base/signals v1.0.0/go.mod h1:voYorBVJwvmJUR5aszken/j9RYH5Fv0lEupTnojOCWc=
