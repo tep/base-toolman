@@ -1,46 +1,46 @@
-package toolman // import "toolman.org/base/toolman"
-
 // Copyright 2017 The Toolworks Development Trust. All rights reserved.
-//
-// Package toolman provides common initialization for toolman.org Go programs.
-//
-// All Go programs for toolman.org should call "toolman.Init()" at or near
-// the beginning of function main() and then immediately defer a call to
-// "toolman.Shutdown()".  This provides a common mechanism for all toolman.org
-// libraries to register actions to be performed both at process startup
-// (via RegisterInit) and during normal termination (via RegisterShutdown).
-//
-// Prior to executing any registered startup functions, toolman.Init() will
-// first ensure that logging is properly setup and that flags have been
-// parsed.
-//
-// Program initialization may be customized by passing one or more InitOption
-// arguments to toolman.Init().
-//
-// The following is a typical use case:
-//
-// 		package fnobish
-//
-// 		import "toolman.org/base/toolman"
-//
-//		func init() {
-//			toolman.RegisterInit(func(){
-//				// Stuff to run on startup
-//			})
-//
-//			toolman.RegisterShutdown(func(){
-//				// Stuff to run on shutdown
-//			})
-//		}
-//
-// 		func main() {
-// 			toolman.Init(toolman.Quiet(), toolman.StandardSignals())
-// 			defer toolman.Shutdown()
-//
-// 			// Do Stuff
-//
-// 		}
-//
+
+/*
+Package toolman provides common initialization for toolman.org Go programs.
+
+All Go programs for toolman.org should call "toolman.Init()" at or near
+the beginning of function main() and then immediately defer a call to
+"toolman.Shutdown()".  This provides a common mechanism for all toolman.org
+libraries to register actions to be performed both at process startup
+(via RegisterInit) and during normal termination (via RegisterShutdown).
+
+Prior to executing any registered startup functions, toolman.Init() will
+first ensure that logging is properly setup and that flags have been
+parsed.
+
+Program initialization may be customized by passing one or more InitOption
+arguments to toolman.Init().
+
+The following is a typical use case:
+
+		package fnobish
+
+		import "toolman.org/base/toolman"
+
+		func init() {
+			toolman.RegisterInit(func() {
+				// Stuff to run on startup
+			})
+
+			toolman.RegisterShutdown(func() {
+				// Stuff to run on shutdown
+			})
+		}
+
+		func main() {
+			toolman.Init(toolman.Quiet(), toolman.StandardSignals())
+			defer toolman.Shutdown()
+
+			// Do Stuff
+
+		}
+*/
+package toolman // import "toolman.org/base/toolman"
 
 import (
 	"sync"
