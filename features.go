@@ -73,8 +73,8 @@ func addLogSpam() {
 
 	log.InfoDepth(2, fmt.Sprintf("Command Line: %s", os.Args[0]))
 	if len(os.Args) > 1 {
-		for _, a := range os.Args[1:] {
-			log.InfoDepth(2, fmt.Sprintf("                  %s", a))
+		for i, a := range os.Args[1:] {
+			log.InfoDepth(2, fmt.Sprintf("              %2d) %s", i+1, a))
 		}
 	}
 }
