@@ -106,7 +106,7 @@ func (c *config) writePIDFile() {
 
 	RegisterShutdown(func() {
 		if err := os.Remove(c.pidfile); err != nil {
-			log.Warning("pidfile %q not removed on shutdown: %v", c.pidfile, err)
+			log.Warningf("pidfile %q not removed on shutdown: %v", c.pidfile, err)
 		}
 	})
 }
