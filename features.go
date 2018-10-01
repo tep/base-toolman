@@ -37,6 +37,10 @@ func (c *config) setupLogging() error {
 		}
 	}
 
+	if c.logToStderr {
+		c.flags.Set("logtostderr", "true")
+	}
+
 	if c.logFiles {
 		if c.mkLogDir {
 			if err := os.MkdirAll(c.logDir, 0777); err != nil {

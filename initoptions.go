@@ -14,13 +14,14 @@ import (
 )
 
 type config struct {
-	stdsigs  bool
-	logDir   string
-	mkLogDir bool
-	logFiles bool
-	logSpam  bool
-	pidfile  string
-	flags    *flagutil.FlagsGroup
+	stdsigs     bool
+	logDir      string
+	mkLogDir    bool
+	logFiles    bool
+	logSpam     bool
+	logToStderr bool
+	pidfile     string
+	flags       *flagutil.FlagsGroup
 }
 
 func newConfig(opts []*InitOption) *config {
@@ -120,6 +121,10 @@ func LogDir(dir string) *InitOption {
 // stderr automatically.
 func MakeLogDir() *InitOption {
 	return &InitOption{setup: func(c *config) { c.mkLogDir = true }}
+}
+
+func LogToStderr() *InitOption {
+	return &InitOption{setup: func(c *config) { c.logToStderr = true; c.logFiles = false }}
 }
 
 // Quiet returns an InitOption that disables logging altogether.
