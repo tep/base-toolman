@@ -1,6 +1,9 @@
 package toolman
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/spf13/pflag"
 )
 
@@ -27,4 +30,11 @@ func ArgList(i int) []string {
 	}
 
 	return nil
+}
+
+func CommandName() string {
+	if len(os.Args) == 0 {
+		return ""
+	}
+	return filepath.Base(os.Args[0])
 }
