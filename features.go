@@ -9,13 +9,17 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/spf13/pflag"
+
 	"toolman.org/base/log"
 	"toolman.org/base/osutil"
 	"toolman.org/base/signals"
 )
 
+const logDirFlag = "log_dir"
+
 func (c *config) setupLogging() error {
-	ld, isSet := c.flags.ValueIsSet("log_dir")
+	ld, isSet := flagIsSet(logDirFlag)
 	if isSet {
 		c.logDir = ld
 	}
@@ -25,26 +29,26 @@ func (c *config) setupLogging() error {
 	}
 
 	if !isSet {
-		if err := c.flags.Set("log_dir", c.logDir); err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to override --log_dir=%q: %v", c.logDir, err)
+		if err := pflag.Set(logDirFlag, c.logDir); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to override --%s=%q: %v", logDirFlag, c.logDir, err)
 		}
 	}
 
 	// A specified command-line flag overrides the config value
-	if ulf, ok := c.flags.ValueIsSet("logfiles"); ok {
+	if ulf, ok := flagIsSet("logfiles"); ok {
 		if v, err := strconv.ParseBool(ulf); err == nil {
 			c.logFiles = v
 		}
 	}
 
 	if c.logToStderr {
-		c.flags.Set("logtostderr", "true")
+		pflag.Set("logtostderr", "true")
 	}
 
 	if c.logFiles {
 		if c.mkLogDir {
 			if err := os.MkdirAll(c.logDir, 0777); err != nil {
-				c.flags.Set("logtostderr", "true")
+				pflag.Set("logtostderr", "true")
 				log.Warning(err)
 			}
 		}
@@ -54,6 +58,13 @@ func (c *config) setupLogging() error {
 	}
 
 	return nil
+}
+
+func flagIsSet(name string) (string, bool) {
+	if f := pflag.Lookup(name); f != nil {
+		return f.Value.String(), f.Changed
+	}
+	return "", false
 }
 
 func addLogSpam() {

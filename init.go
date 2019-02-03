@@ -46,6 +46,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/spf13/pflag"
+
 	"toolman.org/base/log"
 )
 
@@ -78,9 +80,7 @@ func Init(opts ...*InitOption) {
 
 	cfg := newConfig(opts)
 
-	if err := cfg.flags.Parse(); err != nil {
-		panic(err)
-	}
+	pflag.Parse()
 
 	cfg.setup(opts)
 

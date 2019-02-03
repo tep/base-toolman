@@ -10,7 +10,6 @@ package toolman
 //
 import (
 	"github.com/spf13/pflag"
-	"toolman.org/base/flagutil"
 )
 
 type config struct {
@@ -21,14 +20,14 @@ type config struct {
 	logSpam     bool
 	logToStderr bool
 	pidfile     string
-	flags       *flagutil.FlagsGroup
+	flagSet     *pflag.FlagSet
 }
 
 func newConfig(opts []*InitOption) *config {
 	cfg := &config{
-		flags:    flagutil.NewFlagsGroup(),
 		logSpam:  true,
 		logFiles: true,
+		flagSet:  pflag.CommandLine,
 	}
 
 	for _, o := range opts {
@@ -36,6 +35,8 @@ func newConfig(opts []*InitOption) *config {
 			o.init(cfg)
 		}
 	}
+
+	pflag.CommandLine = cfg.flagSet
 
 	return cfg
 }
@@ -86,20 +87,26 @@ func (o *InitOption) Else(options ...*InitOption) *InitOption {
 	}
 }
 
-// FlagSet returns an InitOption that makes fs the primary FlagSet
-// for this app's FlagsGroup.
+// FlagSet returns an InitOption that makes fs the primary FlagSet for this
+// application. All flags from the existing FlagSet will be merged into fs.
+// Flag names already present will be overwritten by those from fs.
 func FlagSet(fs *pflag.FlagSet) *InitOption {
-	return &InitOption{init: func(c *config) { c.flags.SetPrimary(fs) }}
+	return &InitOption{
+		init: func(c *config) {
+			fs.AddFlagSet(c.flagSet)
+			c.flagSet = fs
+		},
+	}
 }
 
-// AddFlagSet returns an InitOption that adds the given FlagSet to the
-// group of FlagSets being processed by this application.  This is useful
-// for integration with frameworks that provide their own flag parsing.
+// AddFlagSet returns an InitOption that adds one or more additional FlagSets
+// to the primary FlagSet for this application. Preexisting flags will not
+// be overwritten.
 func AddFlagSet(sets ...*pflag.FlagSet) *InitOption {
 	return &InitOption{
 		init: func(c *config) {
 			for _, fs := range sets {
-				c.flags.AddFlagSet(fs)
+				c.flagSet.AddFlagSet(fs)
 			}
 		},
 	}
