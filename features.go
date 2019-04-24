@@ -46,6 +46,10 @@ func (c *config) setupLogging() error {
 	}
 
 	if c.logFiles {
+		if c.logFlush != 0 {
+			log.UpdateFlushInterval(c.logFlush)
+		}
+
 		if c.mkLogDir {
 			if err := os.MkdirAll(c.logDir, 0777); err != nil {
 				pflag.Set("logtostderr", "true")

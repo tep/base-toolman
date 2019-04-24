@@ -9,6 +9,8 @@ package toolman
 //        (see PIDFile as an example)
 //
 import (
+	"time"
+
 	"github.com/spf13/pflag"
 )
 
@@ -19,6 +21,7 @@ type config struct {
 	logFiles    bool
 	logSpam     bool
 	logToStderr bool
+	logFlush    time.Duration
 	pidfile     string
 	flagSet     *pflag.FlagSet
 }
@@ -110,6 +113,10 @@ func AddFlagSet(sets ...*pflag.FlagSet) *InitOption {
 			}
 		},
 	}
+}
+
+func LogFlushInterval(d time.Duration) *InitOption {
+	return &InitOption{init: func(c *config) { c.logFlush = d }}
 }
 
 // LogSpam returns an InitOption that enables (spam=true) or disables
