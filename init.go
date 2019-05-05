@@ -40,7 +40,7 @@ The following is a typical use case:
 
 		}
 */
-package toolman // import "toolman.org/base/toolman"
+package toolman // import "toolman.org/base/toolman/v2"
 
 import (
 	"sync"
@@ -48,7 +48,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"toolman.org/base/log"
+	"toolman.org/base/log/v2"
 )
 
 var (
