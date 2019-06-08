@@ -32,6 +32,10 @@ func (c *config) setupLogging() error {
 		if err := pflag.Set(logDirFlag, c.logDir); err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to override --%s=%q: %v", logDirFlag, c.logDir, err)
 		}
+
+		if ldf := pflag.Lookup(logDirFlag); ldf != nil {
+			ldf.Changed = false
+		}
 	}
 
 	// A specified command-line flag overrides the config value
