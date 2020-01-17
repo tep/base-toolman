@@ -1,5 +1,7 @@
 module toolman.org/base/toolman/v2
 
+go 1.13
+
 require (
 	github.com/spf13/pflag v1.0.3
 	toolman.org/base/log/v2 v2.1.0
