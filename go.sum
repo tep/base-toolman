@@ -6,6 +6,8 @@ golang.org/x/sys v0.0.0-20190613124609-5ed2794edfdc h1:x+/QxSNkVFAC+v4pL1f6mZr1z
 golang.org/x/sys v0.0.0-20190613124609-5ed2794edfdc/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 toolman.org/base/log/v2 v2.1.0 h1://Gx1ca5ri88Z7wTuip9Ja7GPlnvp7BlL7C1VRsmTfA=
 toolman.org/base/log/v2 v2.1.0/go.mod h1:S/IHsuY72A9srk+mMzp+QcV4suGhkjlOAeHj5ADURFc=
+toolman.org/base/log/v2 v2.2.0 h1:xVjmlVuH/Q+poDyn9nr0UGdxhzZF8lQKI9sxwIroGno=
+toolman.org/base/log/v2 v2.2.0/go.mod h1:GmfRgRjlw/eb42nUiOHhy0h5l8qK9UJX23wQ46KzJMc=
 toolman.org/base/osutil v1.0.0 h1:nB3Ci7pd4wDnxjeWd4cjvA7kY+aRbXOHM9iXwoJAD1o=
 toolman.org/base/osutil v1.0.0/go.mod h1:ZJPjMfpk8WSm4u+bKpPbnsd8La6Ze9aJj3tU/WlM39M=
 toolman.org/base/runtimeutil v1.0.0 h1:SEHNA5v0Jt11GTRQbyNFr0aVdWoBHprEm4231nx88HI=
