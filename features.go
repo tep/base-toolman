@@ -69,6 +69,14 @@ func (c *config) setupLogging() error {
 		pflag.Set("logtostderr", "true")
 	}
 
+	if c.logPrefix != "" {
+		log.SetStderrPrefix(c.logPrefix)
+	}
+
+	if c.logSuffix != "" {
+		log.SetStderrSuffix(c.logSuffix)
+	}
+
 	if c.logFiles {
 		if c.logFlush != 0 {
 			log.UpdateFlushInterval(c.logFlush)

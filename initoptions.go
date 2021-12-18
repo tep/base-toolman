@@ -42,6 +42,8 @@ type config struct {
 	logSpam     bool
 	logToStderr bool
 	logFlush    time.Duration
+	logPrefix   string
+	logSuffix   string
 	pidfile     string
 	flagSet     *pflag.FlagSet
 }
@@ -137,6 +139,21 @@ func AddFlagSet(sets ...*pflag.FlagSet) *InitOption {
 
 func LogFlushInterval(d time.Duration) *InitOption {
 	return &InitOption{init: func(c *config) { c.logFlush = d }}
+}
+
+func LogLinePrefix(s string) *InitOption {
+	return &InitOption{init: func(c *config) { c.logPrefix = s }}
+}
+
+func LogLineSuffix(s string) *InitOption {
+	return &InitOption{init: func(c *config) { c.logSuffix = s }}
+}
+
+func WrapLogLine(pfx, sfx string) *InitOption {
+	return &InitOption{init: func(c *config) {
+		c.logPrefix = pfx
+		c.logSuffix = sfx
+	}}
 }
 
 // LogSpam returns an InitOption that enables (spam=true) or disables
