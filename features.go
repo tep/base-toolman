@@ -132,7 +132,7 @@ func addLogSpam() {
 
 func setupStdSignals() {
 	signals.RegisterSoftHandler(func(os.Signal) bool {
-		log.Infof("shutting down now")
+		log.V(1).Info("shutting down now")
 		go func() {
 			signals.Stop()
 			Shutdown()
